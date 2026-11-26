@@ -1,0 +1,77 @@
+#!/usr/bin/bash
+
+# Jordon Williams-McKinnon, Evan Payne, CSE224, 11/25/2026, HW8 - GUIs with Dialog
+
+# Takes two parameters: a string for menu text, and an array
+city_menu ()
+{
+	menutext=$1
+	local -n array=$2
+	# By using ${#array[@]} the size of the list will vary depending on the length of the array
+	dialog --output-fd 1 --no-items --menu "$menutext" 0 0 ${#array[@]} "${array[@]}" 
+}
+
+# Creates the res.txt file if not already created
+touch res.txt
+
+# Cities for departure and arrival array
+city[1]="Tokyo"
+city[2]="Osaka"
+city[3]="Kyoto"
+city[4]="Fukusaki"
+city[5]="Tottori"
+city[6]="Hiroshima"
+city[7]="Hito"
+
+
+
+# START OF DISPLAY MESSAGES
+
+# Displays an input box to read users name
+name=$(dialog --output-fd 1 --inputbox "Enter Your Name" 0 0) # --output-fd 1 will store the output from stdout in name
+
+# Displays a menu of cities for the user to depart from
+departcity=$(city_menu "Select a City to Depart From:" city)
+
+# Displays a menu of destination cites
+destcity=$(city_menu "Select a Destination City:" city)
+
+# Displays a calendar for the departure date
+departday=$(dialog --output-fd 1 --date-format "%m/%d/%Y" --calendar "Select a Day to Depart:" 0 0)
+
+# Displays a calendar for the return date
+returnday=$(dialog --output-fd 1 --date-format "%m/%d/%Y" --calendar "Select a Day to Return:" 0 0)
+
+# Displays an input box to read users number of bags
+bags=$(dialog --output-fd 1 --inputbox "Enter Number of Bags:" 0 0)
+
+# END OF DISPLAY MESSAGES
+
+
+# Format to save reservation to txt file
+reservationtofile="$name|$bags|$departcity|$destcity|$departday|$returnday"
+
+
+
+# Check to see if there is a reservation that matches the name of the user
+if grep -q "^$name|" res.txt 	
+then
+	# Removes the previous reservation
+	sed -i "/^$name|/d" res.txt 
+fi
+
+# writes the reservation to the txt file
+echo "$reservationtofile" >> res.txt
+
+dialog --msgbox "Reservation Saved" 0 0
+
+# Clear all display boxes
+clear
+
+
+# Displays all information from user
+reservation="Name: $name | Bags: $bags | Depart: $departcity | Destination: $destcity | Departure Date: $departday | Return Date: $returnday"
+
+echo $reservation
+
+
