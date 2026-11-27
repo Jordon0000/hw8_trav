@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 # HW8 - Guis with Dialog
-# 11/26/2026
+# 11/27/2026
 # CSE 224
 # Group Members: 
 #   Jordon Williams-McKinnon
@@ -18,7 +18,7 @@ city_menu ()
 }
 
 # reservation_confirm function
-# Takes one parameter: reservation information (in the res.txt format)
+# Takes two parameters: reservation information (in the res.txt format) and a message description
 reservation_confirm ()
 {
 	local -n info=$1
@@ -34,10 +34,10 @@ reservation_confirm ()
 	local msg="$prefix\n\n\
 	Name: $info_name\n\
 	Amount of Checked Bags: $info_bags\n\
-	Departure City: $info_deptcity\n\
-	Destination City: $info_destcity\n\
-	Departure Date: $info_deptdate\n\
-	Return Date: $info_retndate"
+	Departing from: $info_deptcity\n\
+	Arriving to: $info_destcity\n\
+	Departure Flight Date: $info_deptdate\n\
+	Return Flight Date: $info_retndate"
 	dialog --keep-tite --title "Reservation Manager - Confirm Info" --yesno "$msg" 0 0
 	# "$name|$bags|$departure_city|$destination_city|$departure_date|$return_date"
 }
@@ -58,10 +58,9 @@ cities[7]="Hito"
 ## START OF DISPLAY MESSAGES
 invalid_input=0 # Flag used to detect if the user's input was invalid
 
-
 # Get the user's name using an input box.
-# The name is also checked for any illegal characters ("|")
-# If any are found, then the user is reprompted to enter their name again.
+# The name is also checked for any illegal characters (such as "|" and "~")
+# If any are found, then the user is prompted to enter their name again.
 while true
 do
     if [[ $invalid_input -eq 1 ]]
@@ -71,14 +70,13 @@ do
 
 	name=$(dialog --keep-tite --no-cancel --title "Reservation Manager" --output-fd 1 --inputbox "Enter your name:" 0 0) # --output-fd 1 will store the output from stdout in name
 
-
 	invalid_input=1
 	if [[ "$name" =~ [|\\/$^_+=\-\`\~] ]]
 	then
 		continue
 	fi
 
-	invalid_input=0 # Reset the failure flag 
+	invalid_input=0
 
 	break
 done
